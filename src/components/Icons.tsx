@@ -18,13 +18,13 @@ export function IconReset() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <path
-        d="M19 12a7 7 0 1 1-2-4.9"
+        d="M16.8 8.2A6.2 6.2 0 1 0 17.6 15"
         fill="none"
         stroke="currentColor"
-        strokeWidth="1.8"
+        strokeWidth="3"
         strokeLinecap="round"
       />
-      <path d="M16 4.5h3.2V8" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M11.6 1.2 22.4 6.4 12.8 10.6Z" fill="currentColor" />
     </svg>
   );
 }

@@ -35,13 +35,15 @@ export function useTimer(segments: Segment[], settings: AudioSettings, presetNam
   const signature = segments
     .map((segment) => `${segment.phase}:${segment.durationSec}:${segment.round}:${segment.cycle}`)
     .join("|");
-
-  useEffect(() => {
-    if (stateRef.current.status !== "idle") return;
+  const signatureRef = useRef(signature);
+  if (signatureRef.current !== signature) {
+    const abandon = state.status !== "idle";
+    signatureRef.current = signature;
     const next = createIdle(segments);
     stateRef.current = next;
+    if (abandon) audio.stop();
     setState(next);
-  }, [signature, segments]);
+  }
 
   useEffect(() => {
     let timer = 0;

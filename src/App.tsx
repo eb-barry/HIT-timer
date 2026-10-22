@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { audio, readListedClips } from "./audio/controller";
 import type { ClipId } from "./audio/clips";
 import type { AudioSettings } from "./audio/settings";
@@ -22,11 +22,6 @@ export function App() {
   const active = data.presets.find((preset) => preset.id === data.activeId) ?? data.presets[0];
   const segments = useMemo(() => buildSegments(active), [active]);
   const timer = useTimer(segments, data.audio, active.name);
-  const shownPresetRef = useRef(active);
-  if (timer.state.status !== "running" && timer.state.status !== "paused") {
-    shownPresetRef.current = active;
-  }
-  const shownPreset = shownPresetRef.current;
   const running = timer.state.status === "running" || timer.state.status === "paused";
   const view = selectView(timer.state, Date.now());
   const statusNote =
@@ -147,7 +142,7 @@ export function App() {
     <div className="app">
       <div className="screen" hidden={settingsOpen}>
         <TimerScreen
-          preset={shownPreset}
+          preset={active}
           state={timer.state}
           progressRef={timer.progressRef}
           onOpenSettings={() => setSettingsOpen(true)}
