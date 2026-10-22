@@ -1,21 +1,23 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { audio, readListedClips } from "./audio/controller";
 import type { ClipId } from "./audio/clips";
 import type { AudioSettings } from "./audio/settings";
-import { IconMore, IconRounds, IconTimer } from "./components/Icons";
-import { MoreScreen } from "./components/MoreScreen";
 import { SettingsScreen } from "./components/SettingsScreen";
 import { TimerScreen } from "./components/TimerScreen";
 import { useTimer } from "./hooks/useTimer";
 import { duplicateName, loadPersisted, savePersisted, type Persisted } from "./storage";
+import { selectView } from "./timer/engine";
+import { formatClock } from "./timer/format";
 import { buildSegments, sanitizeConfig } from "./timer/plan";
-import type { TimerConfig } from "./timer/types";
-
-type Tab = "train" | "settings" | "more";
+import { PHASE_LABEL, type TimerConfig } from "./timer/types";
 
 export function App() {
-  const [data, setData] = useState<Persisted>(() => loadPersisted());
-  const [tab, setTab] = useState<Tab>("train");
+  const [data, setData] = useState<Persisted>(() => {
+    const loaded = loadPersisted();
+    if (!loaded.audio.muted) return loaded;
+    return { ...loaded, audio: { ...loaded.audio, muted: false } };
+  });
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const active = data.presets.find((preset) => preset.id === data.activeId) ?? data.presets[0];
   const segments = useMemo(() => buildSegments(active), [active]);
@@ -26,6 +28,11 @@ export function App() {
   }
   const shownPreset = shownPresetRef.current;
   const running = timer.state.status === "running" || timer.state.status === "paused";
+  const view = selectView(timer.state, Date.now());
+  const statusNote =
+    view.status === "running" || view.status === "paused"
+      ? `${view.paused ? "已暫停" : PHASE_LABEL[view.phase]} ${formatClock(view.displaySec)}`
+      : null;
 
   useEffect(() => {
     savePersisted(data);
@@ -124,21 +131,19 @@ export function App() {
 
   return (
     <div className="app">
-      <div className="screen" hidden={tab !== "train"}>
+      <div className="screen" hidden={settingsOpen}>
         <TimerScreen
           preset={shownPreset}
           state={timer.state}
           caption={timer.caption}
           progressRef={timer.progressRef}
-          muted={data.audio.muted}
-          onToggleMute={() => patchAudio({ muted: !data.audio.muted })}
-          onOpenSettings={() => setTab("settings")}
+          onOpenSettings={() => setSettingsOpen(true)}
           onPrimary={startOrToggle}
           onReset={timer.reset}
           onSkip={timer.skip}
         />
       </div>
-      <div className="screen" hidden={tab !== "settings"}>
+      <div className="screen" hidden={!settingsOpen}>
         <SettingsScreen
           preset={active}
           presets={data.presets}
@@ -146,29 +151,15 @@ export function App() {
           onSelect={selectPreset}
           onAdd={addPreset}
           onDelete={deletePreset}
-        />
-      </div>
-      <div className="screen" hidden={tab !== "more"}>
-        <MoreScreen
-          settings={data.audio}
+          onBack={() => setSettingsOpen(false)}
+          statusNote={statusNote}
+          audio={data.audio}
+          onAudio={patchAudio}
           mp3Clips={data.mp3Clips}
-          running={running}
-          onChange={patchAudio}
           onMp3={(ids: ClipId[]) => setData((current) => ({ ...current, mp3Clips: ids }))}
+          running={running}
         />
       </div>
-
-      <nav className="tabbar" aria-label="主要">
-        <TabButton id="train" label="間歇訓練" current={tab} onSelect={setTab} running={timer.state.status === "running"}>
-          <IconTimer />
-        </TabButton>
-        <TabButton id="settings" label="週期設定" current={tab} onSelect={setTab}>
-          <IconRounds />
-        </TabButton>
-        <TabButton id="more" label="更多" current={tab} onSelect={setTab}>
-          <IconMore />
-        </TabButton>
-      </nav>
 
       {toast ? (
         <div className="toast" role="status">
@@ -176,39 +167,6 @@ export function App() {
         </div>
       ) : null}
     </div>
-  );
-}
-
-function TabButton({
-  id,
-  label,
-  current,
-  onSelect,
-  running,
-  children,
-}: {
-  id: Tab;
-  label: string;
-  current: Tab;
-  onSelect: (tab: Tab) => void;
-  running?: boolean;
-  children: ReactNode;
-}) {
-  const selected = current === id;
-  return (
-    <button
-      type="button"
-      className={selected ? "tab is-on" : "tab"}
-      aria-current={selected ? "page" : undefined}
-      data-testid={`tab-${id}`}
-      onClick={() => onSelect(id)}
-    >
-      <span className="tab-icon">
-        {children}
-        {running ? <i className="live-dot" /> : null}
-      </span>
-      {label}
-    </button>
   );
 }
 

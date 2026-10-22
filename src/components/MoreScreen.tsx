@@ -3,7 +3,7 @@ import { audio } from "../audio/controller";
 import { VOICE_CLIPS, type ClipId } from "../audio/clips";
 import type { AudioSettings } from "../audio/settings";
 
-export function MoreScreen({
+export function SoundPanel({
   settings,
   mp3Clips,
   running,
@@ -43,14 +43,8 @@ export function MoreScreen({
   }
 
   return (
-    <section className="more">
-      <header className="editor-bar">
-        <span />
-        <h1>更多</h1>
-        <span />
-      </header>
-      <div className="scroll">
-        <h2 className="section-title">聲音</h2>
+    <>
+        <h2 className="section-title spaced">聲音</h2>
         <div className="glass panel">
           <ToggleRow label="語音提示" hint="階段名稱與三、二、一" checked={settings.voice} onChange={(voice) => onChange({ voice })} />
           <ToggleRow label="倒數嗶聲" hint="準備每秒一聲，其他階段只在最後三秒" checked={settings.beep} onChange={(beep) => onChange({ beep })} />
@@ -108,8 +102,7 @@ export function MoreScreen({
           {busy ? "偵測中…" : "重新偵測語音檔"}
         </button>
         <p className="rule">三、二、一請各錄成獨立短句，盡量短於一秒，才不會跟下一聲重疊。</p>
-      </div>
-    </section>
+    </>
   );
 }
 
