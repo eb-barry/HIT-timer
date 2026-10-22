@@ -1,6 +1,7 @@
 import { COUNT_VIBRATION, COUNT_WORD, phaseBeep, phaseVibration, secondCues, type BeepKind } from "../timer/cues";
 import type { TimerEffect } from "../timer/engine";
 import type { Phase } from "../timer/types";
+import { publicUrl } from "../publicUrl";
 import { clipById, countClip, isClipId, VOICE_CLIPS, type ClipId } from "./clips";
 import type { AudioSettings } from "./settings";
 
@@ -141,7 +142,7 @@ class AudioController {
     if (!force && this.cache.has(id)) return this.cache.get(id) ?? null;
     try {
       const ctx = this.ensure();
-      const response = await fetch(`/voices/${clipById(id).file}`, { cache: "no-cache" });
+      const response = await fetch(publicUrl(`voices/${clipById(id).file}`), { cache: "no-cache" });
       if (!response.ok) {
         this.cache.set(id, null);
         return null;
@@ -306,7 +307,7 @@ export const audio = new AudioController();
 
 export async function readListedClips(): Promise<ClipId[]> {
   try {
-    const response = await fetch("/voices/index.json", { cache: "no-cache" });
+    const response = await fetch(publicUrl("voices/index.json"), { cache: "no-cache" });
     if (!response.ok) return [];
     const body = (await response.json()) as { clips?: unknown[] };
     return (body.clips ?? []).filter(isClipId);

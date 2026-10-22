@@ -8,6 +8,10 @@ npm run dev
 npm test
 ```
 
+## GitHub Pages
+
+`https://eb-barry.github.io/HIT-timer/` 必須發布建置後的 `dist`，不能直接打開倉庫裡的 `index.html`。推上 `main` 後，GitHub Actions 會以 `/HIT-timer/` 為基底路徑建置並部署。倉庫的 Pages 設定要選 **GitHub Actions**，不要選 Deploy from a branch。
+
 ## 真人語音
 
 電腦語音是暫時的做法。把 MP3 放到 `public/voices/`，檔名固定如下：
