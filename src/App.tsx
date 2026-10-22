@@ -135,7 +135,6 @@ export function App() {
         <TimerScreen
           preset={shownPreset}
           state={timer.state}
-          caption={timer.caption}
           progressRef={timer.progressRef}
           onOpenSettings={() => setSettingsOpen(true)}
           onPrimary={startOrToggle}

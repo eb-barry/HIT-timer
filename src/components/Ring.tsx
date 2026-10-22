@@ -43,7 +43,7 @@ export function Ring({
 
   return (
     <div className={paused ? "ring is-paused" : "ring"} data-phase={phase}>
-      <svg className="ring-svg" viewBox="0 0 100 100" aria-hidden="true">
+      <svg className="ring-svg" viewBox="5 5 90 90" aria-hidden="true">
         <defs>
           <linearGradient id="tube" x1="18%" y1="8%" x2="82%" y2="92%">
             <stop offset="0%" stopColor={highlight} />
