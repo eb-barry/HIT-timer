@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { briefSummary, totalDurationSec } from "../timer/plan";
+import { totalDurationSec } from "../timer/plan";
 import { formatClock } from "../timer/format";
 import { selectView, type TimerState } from "../timer/engine";
 import { PHASE_LABEL, type TimerConfig } from "../timer/types";
@@ -18,7 +18,6 @@ const PHASE_INK: Record<string, string> = {
 export function TimerScreen({
   preset,
   state,
-  caption,
   progressRef,
   onOpenSettings,
   onPrimary,
@@ -27,7 +26,6 @@ export function TimerScreen({
 }: {
   preset: TimerConfig;
   state: TimerState;
-  caption: string | null;
   progressRef: { current: () => number };
   onOpenSettings: () => void;
   onPrimary: () => void;
@@ -55,53 +53,50 @@ export function TimerScreen({
   return (
     <section className="train" data-status={view.status} data-phase={view.phase}>
       <header className="topbar">
-        <span className="topbar-spacer" />
-        <div className="titles">
+        <div className="title-line">
+          <span className="topbar-spacer" />
           <h1>{preset.name}</h1>
-          <p data-testid="total-time">
-            總時間 {formatClock(view.elapsedSec)} / {formatClock(total)}
-          </p>
+          <button type="button" className="gear-btn" onClick={onOpenSettings} aria-label="設定">
+            <IconGear />
+          </button>
         </div>
-        <button type="button" className="gear-btn" onClick={onOpenSettings} aria-label="設定">
-          <IconGear />
-        </button>
+        <p data-testid="total-time">
+          總時間 {formatClock(view.elapsedSec)} / {formatClock(total)}
+        </p>
       </header>
-      <p className="summary">{briefSummary(preset)}</p>
 
       <div className="stage">
-        <Ring phase={view.phase} paused={view.paused} progressRef={progressRef}>
-          <div className="phase-pill" data-testid="phase-label" style={{ color: PHASE_INK[view.phase] }}>
-            {PHASE_LABEL[view.phase]}
+        <div className="dial">
+          <Ring phase={view.phase} paused={view.paused} progressRef={progressRef}>
+            <div className="phase-pill" data-testid="phase-label" style={{ color: PHASE_INK[view.phase] }}>
+              {PHASE_LABEL[view.phase]}
+            </div>
+            <div className="clock" data-testid="timer-clock" aria-label={formatClock(view.displaySec)} key={`${view.phase}-${view.displaySec}`}>
+              <ClockFace seconds={view.displaySec} />
+            </div>
+            <NextPhase paused={view.paused} text={view.nextText} />
+          </Ring>
+          <div className="stats">
+            <article className="glass stat">
+              <p data-testid="round-label">
+                <span className="stat-label">週期</span>
+                <span className="stat-nums">
+                  <strong>{view.round}</strong>
+                  <span className="stat-of">/{view.rounds}</span>
+                </span>
+              </p>
+            </article>
+            <article className="glass stat">
+              <p data-testid="cycle-label">
+                <span className="stat-label">循環</span>
+                <span className="stat-nums">
+                  <strong>{view.cycle}</strong>
+                  <span className="stat-of">/{view.cycles}</span>
+                </span>
+              </p>
+            </article>
           </div>
-          <div className="cue-slot">{caption ? <span className="cue-flash">{caption}</span> : null}</div>
-          <div className="clock" data-testid="timer-clock" aria-label={formatClock(view.displaySec)} key={`${view.phase}-${view.displaySec}`}>
-            <ClockFace seconds={view.displaySec} />
-          </div>
-          <div className="next-chip" data-testid="next-phase">
-            {view.paused ? "已暫停" : view.nextText}
-          </div>
-        </Ring>
-      </div>
-
-      <div className="stats">
-        <article className="glass stat">
-          <p data-testid="round-label">
-            <span className="stat-label">週期</span>
-            <span className="stat-nums">
-              <strong>{view.round}</strong>
-              <span className="stat-of">/{view.rounds}</span>
-            </span>
-          </p>
-        </article>
-        <article className="glass stat">
-          <p data-testid="cycle-label">
-            <span className="stat-label">循環</span>
-            <span className="stat-nums">
-              <strong>{view.cycle}</strong>
-              <span className="stat-of">/{view.cycles}</span>
-            </span>
-          </p>
-        </article>
+        </div>
       </div>
 
       <div className="controls">
@@ -170,6 +165,33 @@ export function TimerScreen({
         </div>
       ) : null}
     </section>
+  );
+}
+
+function NextPhase({ paused, text }: { paused: boolean; text: string }) {
+  const detail = text.startsWith("下個階段：") ? text.slice("下個階段：".length) : null;
+  return (
+    <div className="next-chip" data-testid="next-phase" aria-label={paused ? "已暫停" : text}>
+      {paused || detail === null ? (
+        <span>{paused ? "已暫停" : text}</span>
+      ) : (
+        <>
+          <span className="next-marks" aria-hidden="true">
+            <Triangle />
+            <Triangle />
+          </span>
+          <span>{detail}</span>
+        </>
+      )}
+    </div>
+  );
+}
+
+function Triangle() {
+  return (
+    <svg viewBox="0 0 8 10" aria-hidden="true">
+      <path d="M0.8 0.6 L7.2 5 L0.8 9.4 Z" fill="currentColor" />
+    </svg>
   );
 }
 
