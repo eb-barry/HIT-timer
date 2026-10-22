@@ -39,6 +39,20 @@ export function App() {
   }, [data]);
 
   useEffect(() => {
+    const blockCallout = (event: Event) => {
+      const target = event.target;
+      if (target instanceof Element && target.closest("input, textarea")) return;
+      event.preventDefault();
+    };
+    document.addEventListener("contextmenu", blockCallout);
+    document.addEventListener("selectstart", blockCallout);
+    return () => {
+      document.removeEventListener("contextmenu", blockCallout);
+      document.removeEventListener("selectstart", blockCallout);
+    };
+  }, []);
+
+  useEffect(() => {
     const unlock = () => audio.unlock();
     window.addEventListener("pointerdown", unlock);
     return () => window.removeEventListener("pointerdown", unlock);

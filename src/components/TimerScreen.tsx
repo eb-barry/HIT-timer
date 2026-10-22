@@ -76,27 +76,28 @@ export function TimerScreen({
             </div>
             <NextPhase paused={view.paused} text={view.nextText} />
           </Ring>
-          <div className="stats">
-            <article className="glass stat">
-              <p data-testid="round-label">
-                <span className="stat-label">週期</span>
-                <span className="stat-nums">
-                  <strong>{view.round}</strong>
-                  <span className="stat-of">/{view.rounds}</span>
-                </span>
-              </p>
-            </article>
-            <article className="glass stat">
-              <p data-testid="cycle-label">
-                <span className="stat-label">循環</span>
-                <span className="stat-nums">
-                  <strong>{view.cycle}</strong>
-                  <span className="stat-of">/{view.cycles}</span>
-                </span>
-              </p>
-            </article>
-          </div>
         </div>
+      </div>
+
+      <div className="stats">
+        <article className="glass stat">
+          <p data-testid="round-label">
+            <span className="stat-label">週期</span>
+            <span className="stat-nums">
+              <strong>{view.round}</strong>
+              <span className="stat-of">/{view.rounds}</span>
+            </span>
+          </p>
+        </article>
+        <article className="glass stat">
+          <p data-testid="cycle-label">
+            <span className="stat-label">循環</span>
+            <span className="stat-nums">
+              <strong>{view.cycle}</strong>
+              <span className="stat-of">/{view.cycles}</span>
+            </span>
+          </p>
+        </article>
       </div>
 
       <div className="controls">
@@ -196,16 +197,16 @@ function Triangle() {
 }
 
 function ClockFace({ seconds }: { seconds: number }) {
-  const parts = formatClock(seconds).split(":");
-  return parts.map((part, index) => (
-    <span className="clock-group" key={`${part}-${index}`}>
-      {index > 0 ? (
-        <span className="clock-colon" aria-hidden="true">
-          <i />
-          <i />
-        </span>
-      ) : null}
-      <span className="clock-digits">{part}</span>
-    </span>
-  ));
+  return [...formatClock(seconds)].map((char, index) =>
+    char === ":" ? (
+      <span className="clock-colon" aria-hidden="true" key={index}>
+        <i />
+        <i />
+      </span>
+    ) : (
+      <span className="clock-digits" key={index}>
+        {char}
+      </span>
+    ),
+  );
 }
