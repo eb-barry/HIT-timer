@@ -13,7 +13,10 @@
   color-scheme: light;
 }
 
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+  -webkit-touch-callout: none;
+}
 
 html,
 body,
@@ -25,6 +28,9 @@ body {
   margin: 0;
   min-height: 100dvh;
   overflow: hidden;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
   background:
     radial-gradient(900px 480px at 50% -10%, rgba(255, 255, 255, 0.16), transparent 55%),
     #123e40;
@@ -32,6 +38,13 @@ body {
 
 button,
 input { font: inherit; color: inherit; }
+
+input,
+textarea {
+  -webkit-user-select: text;
+  user-select: text;
+  -webkit-touch-callout: default;
+}
 
 button {
   cursor: pointer;
@@ -218,17 +231,12 @@ button:disabled { cursor: default; opacity: 0.42; }
   min-height: 0;
   width: 100%;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
-  padding: 18px 0 4px;
 }
 
 .dial {
-  width: 75%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 14px;
+  width: 78%;
 }
 
 .ring {
@@ -333,6 +341,7 @@ button:disabled { cursor: default; opacity: 0.42; }
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 3px;
   margin-top: 4px;
   font-family: Outfit, "Avenir Next", "Noto Sans TC", sans-serif;
   font-size: 4.55rem;
@@ -345,24 +354,17 @@ button:disabled { cursor: default; opacity: 0.42; }
   animation: pop 280ms ease;
 }
 
-.clock-group {
-  display: inline-flex;
-  align-items: center;
-}
-
 .clock-digits {
-  letter-spacing: 0.09em;
-  margin-right: -0.09em;
+  letter-spacing: 0;
 }
 
 .clock-colon {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  width: 0.22em;
+  width: 0.14em;
   height: 0.46em;
-  margin: 0 0.1em;
-  transform: translateY(2px);
+  margin: 0;
 }
 
 .clock-colon i {
@@ -409,7 +411,8 @@ button:disabled { cursor: default; opacity: 0.42; }
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
-  width: 100%;
+  width: 78%;
+  margin: 0 auto 28px;
   padding: 0;
 }
 
