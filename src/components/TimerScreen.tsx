@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { briefSummary, totalDurationSec } from "../timer/plan";
 import { formatClock } from "../timer/format";
 import { selectView, type TimerState } from "../timer/engine";
-import { PHASE_EN, PHASE_LABEL, type TimerConfig } from "../timer/types";
+import { PHASE_LABEL, type TimerConfig } from "../timer/types";
 import { IconGear, IconPause, IconPlay, IconReset, IconSkip } from "./Icons";
 import { Ring } from "./Ring";
 
@@ -72,11 +72,10 @@ export function TimerScreen({
         <Ring phase={view.phase} paused={view.paused} progressRef={progressRef}>
           <div className="phase-pill" data-testid="phase-label" style={{ color: PHASE_INK[view.phase] }}>
             {PHASE_LABEL[view.phase]}
-            <small>{PHASE_EN[view.phase]}</small>
           </div>
           <div className="cue-slot">{caption ? <span className="cue-flash">{caption}</span> : null}</div>
-          <div className="clock" data-testid="timer-clock" key={`${view.phase}-${view.displaySec}`}>
-            {formatClock(view.displaySec)}
+          <div className="clock" data-testid="timer-clock" aria-label={formatClock(view.displaySec)} key={`${view.phase}-${view.displaySec}`}>
+            <ClockFace seconds={view.displaySec} />
           </div>
           <div className="next-chip" data-testid="next-phase">
             {view.paused ? "已暫停" : view.nextText}
@@ -88,15 +87,19 @@ export function TimerScreen({
         <article className="glass stat">
           <p data-testid="round-label">
             <span className="stat-label">週期</span>
-            <strong>{view.round}</strong>
-            <span className="stat-of">/{view.rounds}</span>
+            <span className="stat-nums">
+              <strong>{view.round}</strong>
+              <span className="stat-of">/{view.rounds}</span>
+            </span>
           </p>
         </article>
         <article className="glass stat">
           <p data-testid="cycle-label">
             <span className="stat-label">循環</span>
-            <strong>{view.cycle}</strong>
-            <span className="stat-of">/{view.cycles}</span>
+            <span className="stat-nums">
+              <strong>{view.cycle}</strong>
+              <span className="stat-of">/{view.cycles}</span>
+            </span>
           </p>
         </article>
       </div>
@@ -168,4 +171,19 @@ export function TimerScreen({
       ) : null}
     </section>
   );
+}
+
+function ClockFace({ seconds }: { seconds: number }) {
+  const parts = formatClock(seconds).split(":");
+  return parts.map((part, index) => (
+    <span className="clock-group" key={`${part}-${index}`}>
+      {index > 0 ? (
+        <span className="clock-colon" aria-hidden="true">
+          <i />
+          <i />
+        </span>
+      ) : null}
+      <span className="clock-digits">{part}</span>
+    </span>
+  ));
 }
