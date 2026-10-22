@@ -520,6 +520,14 @@ button:disabled { cursor: default; opacity: 0.42; }
 
 .ctrl.primary svg { width: 36px; height: 36px; }
 
+.ctrl.restart {
+  color: #08383b;
+}
+
+.ctrl.restart svg { width: 40px; height: 40px; }
+
+.ctrl.restart:disabled { opacity: 0.82; }
+
 .ctrl:active:not(:disabled) {
   transform: translate(2px, 3px);
   box-shadow:

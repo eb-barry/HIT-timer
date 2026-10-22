@@ -103,7 +103,7 @@ export function TimerScreen({
       <div className="controls">
         <button
           type="button"
-          className="ctrl"
+          className="ctrl restart"
           onClick={requestReset}
           disabled={view.status === "idle"}
           aria-label="重新開始"
