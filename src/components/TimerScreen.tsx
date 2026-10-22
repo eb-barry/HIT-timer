@@ -3,7 +3,7 @@ import { briefSummary, totalDurationSec } from "../timer/plan";
 import { formatClock } from "../timer/format";
 import { selectView, type TimerState } from "../timer/engine";
 import { PHASE_EN, PHASE_LABEL, type TimerConfig } from "../timer/types";
-import { IconGear, IconPause, IconPlay, IconReset, IconSkip, IconSpeaker } from "./Icons";
+import { IconGear, IconPause, IconPlay, IconReset, IconSkip } from "./Icons";
 import { Ring } from "./Ring";
 
 const PHASE_INK: Record<string, string> = {
@@ -20,8 +20,6 @@ export function TimerScreen({
   state,
   caption,
   progressRef,
-  muted,
-  onToggleMute,
   onOpenSettings,
   onPrimary,
   onReset,
@@ -31,8 +29,6 @@ export function TimerScreen({
   state: TimerState;
   caption: string | null;
   progressRef: { current: () => number };
-  muted: boolean;
-  onToggleMute: () => void;
   onOpenSettings: () => void;
   onPrimary: () => void;
   onReset: () => void;
@@ -59,16 +55,14 @@ export function TimerScreen({
   return (
     <section className="train" data-status={view.status} data-phase={view.phase}>
       <header className="topbar">
-        <button type="button" className="icon-btn" onClick={onToggleMute} aria-pressed={muted} aria-label={muted ? "開啟聲音" : "靜音"}>
-          <IconSpeaker muted={muted} />
-        </button>
+        <span className="topbar-spacer" />
         <div className="titles">
           <h1>{preset.name}</h1>
           <p data-testid="total-time">
             總時間 {formatClock(view.elapsedSec)} / {formatClock(total)}
           </p>
         </div>
-        <button type="button" className="icon-btn" onClick={onOpenSettings} aria-label="週期設定">
+        <button type="button" className="gear-btn" onClick={onOpenSettings} aria-label="設定">
           <IconGear />
         </button>
       </header>
@@ -92,23 +86,17 @@ export function TimerScreen({
 
       <div className="stats">
         <article className="glass stat">
-          <span className="stat-label">
-            <i className="mini-pebble pebble-water" />
-            週期
-          </span>
           <p data-testid="round-label">
+            <span className="stat-label">週期</span>
             <strong>{view.round}</strong>
-            <span>/ {view.rounds}</span>
+            <span className="stat-of">/{view.rounds}</span>
           </p>
         </article>
         <article className="glass stat">
-          <span className="stat-label">
-            <i className="mini-pebble pebble-sand" />
-            循環
-          </span>
           <p data-testid="cycle-label">
+            <span className="stat-label">循環</span>
             <strong>{view.cycle}</strong>
-            <span>/ {view.cycles}</span>
+            <span className="stat-of">/{view.cycles}</span>
           </p>
         </article>
       </div>
@@ -116,7 +104,7 @@ export function TimerScreen({
       <div className="controls">
         <button
           type="button"
-          className="glass ctrl"
+          className="ctrl"
           onClick={requestReset}
           disabled={view.status === "idle"}
           aria-label="重新開始"
@@ -135,7 +123,7 @@ export function TimerScreen({
         </button>
         <button
           type="button"
-          className="glass ctrl"
+          className="ctrl"
           onClick={onSkip}
           disabled={view.status === "idle" || view.status === "complete"}
           aria-label="跳過這個階段"

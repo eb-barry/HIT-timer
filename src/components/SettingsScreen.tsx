@@ -1,4 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import type { ClipId } from "../audio/clips";
+import type { AudioSettings } from "../audio/settings";
+import { SoundPanel } from "./MoreScreen";
 import { buildSegments, planSummary, sanitizeConfig, totalDurationSec } from "../timer/plan";
 import { formatClock } from "../timer/format";
 import { LIMITS, type ConfigKey, type TimerConfig } from "../timer/types";
@@ -34,6 +37,13 @@ export function SettingsScreen({
   onSelect,
   onAdd,
   onDelete,
+  onBack,
+  statusNote,
+  audio,
+  onAudio,
+  mp3Clips,
+  onMp3,
+  running,
 }: {
   preset: TimerConfig;
   presets: TimerConfig[];
@@ -41,11 +51,19 @@ export function SettingsScreen({
   onSelect: (id: string) => void;
   onAdd: () => void;
   onDelete: (id: string) => void;
+  onBack: () => void;
+  statusNote: string | null;
+  audio: AudioSettings;
+  onAudio: (patch: Partial<AudioSettings>) => void;
+  mp3Clips: ClipId[];
+  onMp3: (ids: ClipId[]) => void;
+  running: boolean;
 }) {
   const [draft, setDraft] = useState(preset);
   const [picker, setPicker] = useState<ConfigKey | null>(null);
   const [pendingSelect, setPendingSelect] = useState<string | null>(null);
   const [pendingAdd, setPendingAdd] = useState(false);
+  const [pendingBack, setPendingBack] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const dirty = isDirty(draft, preset);
   const safe = sanitizeConfig(draft);
@@ -74,13 +92,18 @@ export function SettingsScreen({
     then();
   }
 
+  function requestBack() {
+    if (dirty) setPendingBack(true);
+    else onBack();
+  }
+
   return (
     <section className="settings">
       <header className="editor-bar">
-        <button type="button" className="text-btn" onClick={() => setDraft(preset)} disabled={!dirty}>
-          取消
+        <button type="button" className="text-btn" onClick={requestBack}>
+          返回
         </button>
-        <h1>週期設定</h1>
+        <h1>設定</h1>
         <button
           type="button"
           className="text-btn save"
@@ -91,6 +114,11 @@ export function SettingsScreen({
           儲存
         </button>
       </header>
+      {statusNote ? (
+        <button type="button" className="live-chip" onClick={requestBack}>
+          {statusNote}
+        </button>
+      ) : null}
 
       <div className="scroll">
         <label className="name-field glass">
@@ -184,6 +212,14 @@ export function SettingsScreen({
         >
           刪除這個計時器
         </button>
+
+        <SoundPanel
+          settings={audio}
+          mp3Clips={mp3Clips}
+          running={running}
+          onChange={onAudio}
+          onMp3={onMp3}
+        />
       </div>
 
       {picker ? (
@@ -230,6 +266,24 @@ export function SettingsScreen({
             onAdd();
           }}
           onClose={() => setPendingAdd(false)}
+        />
+      ) : null}
+
+      {pendingBack ? (
+        <ChoiceDialog
+          title="設定還沒儲存"
+          copy="返回計時畫面之前，要先儲存週期變更嗎？"
+          confirm="儲存並返回"
+          alt="不儲存"
+          onConfirm={() => {
+            setPendingBack(false);
+            commitAnd(onBack);
+          }}
+          onAlt={() => {
+            setPendingBack(false);
+            onBack();
+          }}
+          onClose={() => setPendingBack(false)}
         />
       ) : null}
 
