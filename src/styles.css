@@ -233,10 +233,12 @@ button:disabled { cursor: default; opacity: 0.42; }
   display: flex;
   align-items: center;
   justify-content: center;
+  container-type: size;
 }
 
 .dial {
-  width: 78%;
+  width: min(78cqi, 100cqb);
+  aspect-ratio: 1;
 }
 
 .ring {
@@ -424,49 +426,61 @@ button:disabled { cursor: default; opacity: 0.42; }
 }
 
 .stat {
-  border-radius: 18px;
-  padding: 12px 8px;
-}
-
-.stat-label {
-  color: rgba(20, 56, 58, 0.82);
-  font-size: 1.2rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-}
-
-.stat p {
+  border-radius: 22px;
+  padding: 10px 8px 12px;
   display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 6px;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+}
+
+.stat-title {
   margin: 0;
+  width: 100%;
+  text-align: center;
+  color: #14383a;
+  font-size: 1.22rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  line-height: 1.25;
   white-space: nowrap;
-  font-family: Outfit, "Noto Sans TC", sans-serif;
+}
+
+.bead-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  margin-top: 2px;
+  container-type: inline-size;
+}
+
+.bead-wrap svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.bead { transition: fill 180ms ease; }
+
+.bead-num {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  color: #14686b;
+  font-family: Outfit, "Avenir Next", "Noto Sans TC", sans-serif;
+  font-size: 2.75rem;
+  font-size: 38cqi;
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
-}
-
-.stat-nums {
-  display: inline-flex;
-  align-items: baseline;
-  margin-left: auto;
-}
-
-.stat strong {
-  font-size: 2.05rem;
-  font-weight: 700;
+  line-height: 1;
   letter-spacing: 0;
-  color: var(--deep);
-  line-height: 0.95;
+  pointer-events: none;
 }
 
-.stat-of {
-  font-size: 1.28rem;
-  font-weight: 700;
-  color: rgba(20, 56, 58, 0.55);
-}
-
-.stat:last-child strong { color: #8a5b42; }
+.stat-sand .bead-num { color: #8a5b42; }
 
 .mini-pebble,
 .pebble {
