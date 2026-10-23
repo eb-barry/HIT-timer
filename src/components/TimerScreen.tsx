@@ -4,6 +4,7 @@ import { formatClock } from "../timer/format";
 import { selectView, type TimerState } from "../timer/engine";
 import { PHASE_LABEL, type TimerConfig } from "../timer/types";
 import { IconGear, IconPause, IconPlay, IconReset, IconSkip } from "./Icons";
+import { ProgressCard } from "./ProgressCard";
 import { Ring } from "./Ring";
 
 const PHASE_INK: Record<string, string> = {
@@ -80,24 +81,22 @@ export function TimerScreen({
       </div>
 
       <div className="stats">
-        <article className="glass stat">
-          <p data-testid="round-label">
-            <span className="stat-label">週期</span>
-            <span className="stat-nums">
-              <strong>{view.round}</strong>
-              <span className="stat-of">/{view.rounds}</span>
-            </span>
-          </p>
-        </article>
-        <article className="glass stat">
-          <p data-testid="cycle-label">
-            <span className="stat-label">循環</span>
-            <span className="stat-nums">
-              <strong>{view.cycle}</strong>
-              <span className="stat-of">/{view.cycles}</span>
-            </span>
-          </p>
-        </article>
+        <ProgressCard
+          label="週期"
+          current={view.round}
+          total={view.rounds}
+          complete={view.status === "complete"}
+          tone="water"
+          testId="round-label"
+        />
+        <ProgressCard
+          label="循環"
+          current={view.cycle}
+          total={view.cycles}
+          complete={view.status === "complete"}
+          tone="sand"
+          testId="cycle-label"
+        />
       </div>
 
       <div className="controls">
