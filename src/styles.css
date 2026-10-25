@@ -305,8 +305,9 @@ button:disabled { cursor: default; opacity: 0.42; }
 
 .ring-core {
   position: absolute;
-  /* Cover only the thin mint ring beside the numbers. The white dial outside it stays. */
-  inset: 8.6%;
+  /* The dial reads as six colored rings. This covers only the innermost
+     mint band and lets it join the dark number field. Five rings stay outside. */
+  inset: 13.35%;
   z-index: 2;
   border-radius: 50%;
   display: flex;
