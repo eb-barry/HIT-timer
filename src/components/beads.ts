@@ -5,7 +5,7 @@ export type BeadState = "future" | "done" | "current";
 
 export const BEAD_COLORS: Record<BeadTone, { future: string; done: string; current: string; glow: string; aura: string }> = {
   water: { future: "#1B6E70", done: "#7EE8E2", current: "#E9FFFB", glow: "#7EFFF6", aura: "#14F0E4" },
-  sand: { future: "#8A6248", done: "#E2B07C", current: "#F0B06A", glow: "#FFD0A4", aura: "#F09440" },
+  sand: { future: "#8A6248", done: "#E2B07C", current: "#FFFFFF", glow: "#F3D0B4", aura: "#E2B07C" },
 };
 
 const TAU = Math.PI * 2;
