@@ -1,4 +1,4 @@
-import { BEAD_COLORS, CYCLE_RIM, beadPath, beadSpans, beadStates, type BeadTone } from "./beads";
+import { BEAD_COLORS, beadPath, beadSpans, beadStates, type BeadTone } from "./beads";
 
 export function ProgressCard({
   label,
@@ -7,7 +7,6 @@ export function ProgressCard({
   complete,
   tone,
   testId,
-  opening = false,
 }: {
   label: string;
   current: number;
@@ -15,14 +14,11 @@ export function ProgressCard({
   complete: boolean;
   tone: BeadTone;
   testId: string;
-  /** Cycle card, before the first work interval: light-green rim. */
-  opening?: boolean;
 }) {
   const colors = BEAD_COLORS[tone];
   const states = beadStates(total, current, complete);
   const spans = beadSpans(states.length);
   const shown = states.length === 0 ? 1 : Math.min(states.length, Math.max(1, Math.round(current)));
-  const rim = tone === "sand" && opening ? CYCLE_RIM.opening : CYCLE_RIM.during;
 
   return (
     <article
@@ -42,8 +38,8 @@ export function ProgressCard({
             <filter id={`bead-glow-${tone}`} filterUnits="userSpaceOnUse" x="-20" y="-20" width="140" height="140" colorInterpolationFilters="sRGB">
               <feGaussianBlur in="SourceAlpha" stdDeviation="1.05" result="tight" />
               <feGaussianBlur in="SourceAlpha" stdDeviation="2.5" result="wide" />
-              <feFlood floodColor={tone === "sand" ? rim.glow : colors.glow} floodOpacity="1" result="core" />
-              <feFlood floodColor={tone === "sand" ? rim.aura : colors.aura} floodOpacity="0.9" result="bloom" />
+              <feFlood floodColor={colors.glow} floodOpacity="1" result="core" />
+              <feFlood floodColor={colors.aura} floodOpacity="0.9" result="bloom" />
               <feComposite in="core" in2="tight" operator="in" result="coreGlow" />
               <feComposite in="bloom" in2="wide" operator="in" result="auraGlow" />
               <feMerge>
@@ -55,19 +51,6 @@ export function ProgressCard({
           </defs>
           {spans.map((span, index) => {
             const state = states[index];
-            if (tone === "sand" && state === "current") {
-              return (
-                <g key={index} data-state={state} data-rim={opening ? "green" : "yellow"}>
-                  <path
-                    className="bead"
-                    d={beadPath(span.start, span.end, 44, 37.6)}
-                    fill={rim.fill}
-                    filter={`url(#bead-glow-${tone})`}
-                  />
-                  <path className="bead" d={beadPath(span.start, span.end, 38.1, 31)} fill="#FFFFFF" />
-                </g>
-              );
-            }
             return (
               <path
                 key={index}

@@ -96,7 +96,6 @@ export function TimerScreen({
           complete={view.status === "complete"}
           tone="sand"
           testId="cycle-label"
-          opening={view.status === "idle" || view.phase === "prepare"}
         />
       </div>
 

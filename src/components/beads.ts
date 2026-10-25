@@ -5,13 +5,7 @@ export type BeadState = "future" | "done" | "current";
 
 export const BEAD_COLORS: Record<BeadTone, { future: string; done: string; current: string; glow: string; aura: string }> = {
   water: { future: "#1B6E70", done: "#7EE8E2", current: "#E9FFFB", glow: "#7EFFF6", aura: "#14F0E4" },
-  sand: { future: "#8A6248", done: "#E2B07C", current: "#FFFFFF", glow: "#FFE7A8", aura: "#F0C85A" },
-};
-
-/** In-progress cycle bead: white inside, a glowing rim outside. */
-export const CYCLE_RIM = {
-  opening: { fill: "#A9F0DC", glow: "#E9FFF8", aura: "#67E6C4" },
-  during: { fill: "#F6E3A4", glow: "#FFE7A8", aura: "#F0C85A" },
+  sand: { future: "#8A6248", done: "#E2B07C", current: "#F0B06A", glow: "#FFD0A4", aura: "#F09440" },
 };
 
 const TAU = Math.PI * 2;
@@ -44,39 +38,39 @@ export function beadSpans(count: number): Array<{ start: number; end: number }> 
   });
 }
 
-export function beadPath(start: number, end: number, outer = OUTER, inner = INNER): string {
+export function beadPath(start: number, end: number): string {
   const span = Math.max(0, end - start);
-  if (span <= 0.001 || outer <= inner) return "";
-  const thickness = outer - inner;
+  if (span <= 0.001) return "";
+  const thickness = OUTER - INNER;
   let cr = Math.min(2.35, thickness * 0.34);
   for (let attempt = 0; attempt < 8; attempt += 1) {
-    const outerInset = Math.asin(clamp01(cr / (outer - cr)));
-    const innerInset = Math.asin(clamp01(cr / (inner + cr)));
+    const outerInset = Math.asin(clamp01(cr / (OUTER - cr)));
+    const innerInset = Math.asin(clamp01(cr / (INNER + cr)));
     if (outerInset * 2 < span - 0.004 && innerInset * 2 < span - 0.004) break;
     cr *= 0.7;
   }
-  if (cr < 0.45) return plainSector(start, end, outer, inner);
-  return roundedSector(start, end, cr, outer, inner);
+  if (cr < 0.45) return plainSector(start, end);
+  return roundedSector(start, end, cr);
 }
 
-function roundedSector(start: number, end: number, cr: number, outer: number, inner: number): string {
-  const outerInset = Math.asin(cr / (outer - cr));
-  const innerInset = Math.asin(cr / (inner + cr));
-  const outerSide = (outer - cr) * Math.cos(outerInset);
-  const innerSide = (inner + cr) * Math.cos(innerInset);
-  const outerStart = point(outer, start + outerInset);
-  const outerEnd = point(outer, end - outerInset);
-  const innerEnd = point(inner, end - innerInset);
-  const innerStart = point(inner, start + innerInset);
+function roundedSector(start: number, end: number, cr: number): string {
+  const outerInset = Math.asin(cr / (OUTER - cr));
+  const innerInset = Math.asin(cr / (INNER + cr));
+  const outerSide = (OUTER - cr) * Math.cos(outerInset);
+  const innerSide = (INNER + cr) * Math.cos(innerInset);
+  const outerStart = point(OUTER, start + outerInset);
+  const outerEnd = point(OUTER, end - outerInset);
+  const innerEnd = point(INNER, end - innerInset);
+  const innerStart = point(INNER, start + innerInset);
   const capStartOuter = point(outerSide, start);
   const capStartInner = point(innerSide, start);
   const capEndOuter = point(outerSide, end);
   const capEndInner = point(innerSide, end);
   const centers = {
-    outerStart: point(outer - cr, start + outerInset),
-    outerEnd: point(outer - cr, end - outerInset),
-    innerEnd: point(inner + cr, end - innerInset),
-    innerStart: point(inner + cr, start + innerInset),
+    outerStart: point(OUTER - cr, start + outerInset),
+    outerEnd: point(OUTER - cr, end - outerInset),
+    innerEnd: point(INNER + cr, end - innerInset),
+    innerStart: point(INNER + cr, start + innerInset),
   };
   const largeOuter = end - start - outerInset * 2 > Math.PI ? 1 : 0;
   const largeInner = end - start - innerInset * 2 > Math.PI ? 1 : 0;
@@ -84,23 +78,23 @@ function roundedSector(start: number, end: number, cr: number, outer: number, in
   return [
     `M ${fmt(capStartOuter)}`,
     arc(cr, capStartOuter, outerStart, centers.outerStart),
-    `A ${trim(outer)} ${trim(outer)} 0 ${largeOuter} 1 ${fmt(outerEnd)}`,
+    `A ${OUTER} ${OUTER} 0 ${largeOuter} 1 ${fmt(outerEnd)}`,
     arc(cr, outerEnd, capEndOuter, centers.outerEnd),
     `L ${fmt(capEndInner)}`,
     arc(cr, capEndInner, innerEnd, centers.innerEnd),
-    `A ${trim(inner)} ${trim(inner)} 0 ${largeInner} 0 ${fmt(innerStart)}`,
+    `A ${INNER} ${INNER} 0 ${largeInner} 0 ${fmt(innerStart)}`,
     arc(cr, innerStart, capStartInner, centers.innerStart),
     "Z",
   ].join(" ");
 }
 
-function plainSector(start: number, end: number, outer: number, inner: number): string {
-  const outerStart = point(outer, start);
-  const outerEnd = point(outer, end);
-  const innerEnd = point(inner, end);
-  const innerStart = point(inner, start);
+function plainSector(start: number, end: number): string {
+  const outerStart = point(OUTER, start);
+  const outerEnd = point(OUTER, end);
+  const innerEnd = point(INNER, end);
+  const innerStart = point(INNER, start);
   const large = end - start > Math.PI ? 1 : 0;
-  return `M ${fmt(outerStart)} A ${trim(outer)} ${trim(outer)} 0 ${large} 1 ${fmt(outerEnd)} L ${fmt(innerEnd)} A ${trim(inner)} ${trim(inner)} 0 ${large} 0 ${fmt(innerStart)} Z`;
+  return `M ${fmt(outerStart)} A ${OUTER} ${OUTER} 0 ${large} 1 ${fmt(outerEnd)} L ${fmt(innerEnd)} A ${INNER} ${INNER} 0 ${large} 0 ${fmt(innerStart)} Z`;
 }
 
 function arc(radius: number, from: [number, number], to: [number, number], center: [number, number]): string {
