@@ -256,6 +256,9 @@ button:disabled { cursor: default; opacity: 0.42; }
   background: radial-gradient(circle, rgba(190, 236, 230, 0.45), transparent 68%);
   filter: blur(10px);
   pointer-events: none;
+  /* Keep the mint halo behind the outer ring. The dark core fills the hole. */
+  -webkit-mask-image: radial-gradient(circle, transparent 0 52%, #000 64%);
+  mask-image: radial-gradient(circle, transparent 0 52%, #000 64%);
 }
 
 .ring[data-phase="rest"]::before,
@@ -305,7 +308,8 @@ button:disabled { cursor: default; opacity: 0.42; }
 
 .ring-core {
   position: absolute;
-  inset: 16%;
+  /* Cover the mint inner lip of the dial so the digits sit on the dark core. */
+  inset: 9%;
   z-index: 2;
   border-radius: 50%;
   display: flex;
@@ -315,10 +319,10 @@ button:disabled { cursor: default; opacity: 0.42; }
   text-align: center;
   color: #f7fbfb;
   background:
-    radial-gradient(circle at 50% 16%, rgba(255, 255, 255, 0.42), transparent 32%),
-    radial-gradient(circle at 50% 100%, rgba(4, 24, 26, 0.38), transparent 46%),
-    rgba(12, 68, 72, 0.72);
-  border: 1px solid rgba(255, 255, 255, 0.28);
+    radial-gradient(circle at 50% 16%, rgba(255, 255, 255, 0.34), transparent 30%),
+    radial-gradient(circle at 50% 100%, rgba(4, 24, 26, 0.34), transparent 46%),
+    #146066;
+  border: 0;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.48),
     inset 0 -18px 30px rgba(8, 36, 38, 0.22);
