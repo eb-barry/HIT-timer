@@ -1,15 +1,8 @@
 import { useEffect, useRef, type ReactNode } from "react";
-import { publicUrl } from "../publicUrl";
 import type { Phase } from "../timer/types";
 
 const RADIUS = 39;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
-/** Outer edge of the dial track, in viewBox units. The viewBox is 90×90 centered at 50. */
-const RING_OUTER_R = 45;
-/** Matches `.ring-core` inset so the photo stops at the glass center. */
-const CORE_INSET = 0.1335;
-const BEACH_INNER_R = RING_OUTER_R - CORE_INSET * 90;
-const BEACH_URL = publicUrl("beach-ring.jpg");
 
 const RING_COLORS: Record<Phase, [string, string, string]> = {
   prepare: ["#F7FFFE", "#9AE6E1", "#14686B"],
@@ -33,7 +26,6 @@ export function Ring({
 }) {
   const progress = useRef<SVGCircleElement>(null);
   const sheen = useRef<SVGCircleElement>(null);
-  const beachCover = useRef<SVGCircleElement>(null);
   const [highlight, mid, shadow] = RING_COLORS[phase];
 
   useEffect(() => {
@@ -43,8 +35,6 @@ export function Ring({
       const offset = String(CIRCUMFERENCE * (1 - ratio));
       if (progress.current) progress.current.style.strokeDashoffset = offset;
       if (sheen.current) sheen.current.style.strokeDashoffset = offset;
-      // Same dash as the colored arc, so the photo is hidden there and shows in the grey gap.
-      if (beachCover.current) beachCover.current.style.strokeDashoffset = offset;
       frame = requestAnimationFrame(paint);
     };
     frame = requestAnimationFrame(paint);
@@ -66,35 +56,6 @@ export function Ring({
         </defs>
         <circle className="ring-track" cx="50" cy="50" r={RADIUS} />
         <circle className="ring-groove" cx="50" cy="50" r={RADIUS} />
-        {phase === "work" && (
-          <>
-            <mask id="beach-gap" maskUnits="userSpaceOnUse">
-              <circle cx="50" cy="50" r={RING_OUTER_R} fill="white" />
-              <circle cx="50" cy="50" r={BEACH_INNER_R} fill="black" />
-              <circle
-                ref={beachCover}
-                cx="50"
-                cy="50"
-                r={RADIUS}
-                fill="none"
-                stroke="black"
-                strokeWidth="16"
-                strokeDasharray={CIRCUMFERENCE}
-              />
-            </mask>
-            <g mask="url(#beach-gap)">
-              <image
-                href={BEACH_URL}
-                x="5"
-                y="5"
-                width="90"
-                height="90"
-                transform="rotate(90 50 50)"
-                preserveAspectRatio="xMidYMid slice"
-              />
-            </g>
-          </>
-        )}
         <circle
           ref={progress}
           className="ring-progress"
